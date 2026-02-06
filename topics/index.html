@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dev Quick Ref</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface-hover: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent-git: #f97316;
+    --accent-commit: #22d3ee;
+    --accent-azure: #3b82f6;
+    --accent-misc: #a78bfa;
+    --code-bg: #0d1117;
+    --tag: rgba(255,255,255,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 20px 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .header h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent-git), var(--accent-commit));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .tab {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { background: var(--surface); color: var(--text); }
+  .tab.active { background: var(--surface); color: var(--text); border-color: transparent; }
+  .tab[data-section="git"].active { color: var(--accent-git); }
+  .tab[data-section="commits"].active { color: var(--accent-commit); }
+  .tab[data-section="azure"].active { color: var(--accent-azure); }
+  .tab[data-section="misc"].active { color: var(--accent-misc); }
+
+  /* ── Content ── */
+  .content {
+    padding: 16px 24px 40px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(255,255,255,0.12); }
+
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-title .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  [data-accent="git"] .dot { background: var(--accent-git); }
+  [data-accent="git"] .card-title { color: var(--accent-git); }
+  [data-accent="commit"] .dot { background: var(--accent-commit); }
+  [data-accent="commit"] .card-title { color: var(--accent-commit); }
+  [data-accent="azure"] .dot { background: var(--accent-azure); }
+  [data-accent="azure"] .card-title { color: var(--accent-azure); }
+  [data-accent="misc"] .dot { background: var(--accent-misc); }
+  [data-accent="misc"] .card-title { color: var(--accent-misc); }
+
+  .cmd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    gap: 12px;
+  }
+
+  .cmd-row:last-child { border-bottom: none; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: #e2e8f0;
+    background: var(--code-bg);
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .cmd-desc {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    text-align: right;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Conventional commit type badges */
+  .commit-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .commit-type:last-child { border-bottom: none; }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 4px;
+    min-width: 70px;
+    text-align: center;
+  }
+
+  .commit-type .desc {
+    font-size: 11.5px;
+    color: var(--text-dim);
+  }
+
+  .badge-feat { background: rgba(34,211,238,0.12); color: #22d3ee; }
+  .badge-fix { background: rgba(249,115,22,0.12); color: #f97316; }
+  .badge-docs { background: rgba(167,139,250,0.12); color: #a78bfa; }
+  .badge-style { background: rgba(236,72,153,0.12); color: #ec4899; }
+  .badge-refactor { background: rgba(250,204,21,0.12); color: #facc15; }
+  .badge-perf { background: rgba(52,211,153,0.12); color: #34d399; }
+  .badge-test { background: rgba(96,165,250,0.12); color: #60a5fa; }
+  .badge-build { background: rgba(251,146,60,0.12); color: #fb923c; }
+  .badge-ci { background: rgba(129,140,248,0.12); color: #818cf8; }
+  .badge-chore { background: rgba(148,163,184,0.12); color: #94a3b8; }
+  .badge-revert { background: rgba(244,63,94,0.12); color: #f43f5e; }
+
+  .format-example {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-dim);
+  }
+
+  .format-example .hl { color: #22d3ee; }
+  .format-example .hl2 { color: #a78bfa; }
+  .format-example .hl3 { color: #facc15; }
+
+  /* Search */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 14px 10px 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: rgba(255,255,255,0.2); }
+  .search-wrap input::placeholder { color: var(--text-dim); }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>~/dev-ref</h1>
+  <div class="tabs">
+    <button class="tab active" data-section="git">Git</button>
+    <button class="tab" data-section="commits">Commits</button>
+    <button class="tab" data-section="azure">Azure CLI</button>
+    <button class="tab" data-section="misc">Misc</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="search" placeholder="Search commands..." autocomplete="off">
+  </div>
+
+  <!-- ═══════════ GIT ═══════════ -->
+  <div class="section active" id="git">
+    <div class="card-grid">
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Basics</div>
+        <div class="cmd-row"><code>git init</code><span class="cmd-desc">Init new repo</span></div>
+        <div class="cmd-row"><code>git clone &lt;url&gt;</code><span class="cmd-desc">Clone remote</span></div>
+        <div class="cmd-row"><code>git status</code><span class="cmd-desc">Working tree status</span></div>
+        <div class="cmd-row"><code>git add -A</code><span class="cmd-desc">Stage all changes</span></div>
+        <div class="cmd-row"><code>git add -p</code><span class="cmd-desc">Stage interactively</span></div>
+        <div class="cmd-row"><code>git commit -m "msg"</code><span class="cmd-desc">Commit staged</span></div>
+        <div class="cmd-row"><code>git commit --amend</code><span class="cmd-desc">Amend last commit</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Branching</div>
+        <div class="cmd-row"><code>git branch</code><span class="cmd-desc">List branches</span></div>
+        <div class="cmd-row"><code>git branch &lt;name&gt;</code><span class="cmd-desc">Create branch</span></div>
+        <div class="cmd-row"><code>git switch &lt;name&gt;</code><span class="cmd-desc">Switch branch</span></div>
+        <div class="cmd-row"><code>git switch -c &lt;name&gt;</code><span class="cmd-desc">Create &amp; switch</span></div>
+        <div class="cmd-row"><code>git merge &lt;branch&gt;</code><span class="cmd-desc">Merge into current</span></div>
+        <div class="cmd-row"><code>git rebase &lt;branch&gt;</code><span class="cmd-desc">Rebase onto branch</span></div>
+        <div class="cmd-row"><code>git branch -d &lt;name&gt;</code><span class="cmd-desc">Delete branch</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Remote</div>
+        <div class="cmd-row"><code>git push</code><span class="cmd-desc">Push to remote</span></div>
+        <div class="cmd-row"><code>git push -u origin &lt;b&gt;</code><span class="cmd-desc">Push &amp; set upstream</span></div>
+        <div class="cmd-row"><code>git pull</code><span class="cmd-desc">Fetch &amp; merge</span></div>
+        <div class="cmd-row"><code>git fetch --all</code><span class="cmd-desc">Fetch all remotes</span></div>
+        <div class="cmd-row"><code>git remote -v</code><span class="cmd-desc">List remotes</span></div>
+        <div class="cmd-row"><code>git push --force-with-lease</code><span class="cmd-desc">Safe force push</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>History & Diff</div>
+        <div class="cmd-row"><code>git log --oneline -20</code><span class="cmd-desc">Compact log</span></div>
+        <div class="cmd-row"><code>git log --graph --all</code><span class="cmd-desc">Visual graph</span></div>
+        <div class="cmd-row"><code>git diff</code><span class="cmd-desc">Unstaged changes</span></div>
+        <div class="cmd-row"><code>git diff --staged</code><span class="cmd-desc">Staged changes</span></div>
+        <div class="cmd-row"><code>git show &lt;hash&gt;</code><span class="cmd-desc">Show commit</span></div>
+        <div class="cmd-row"><code>git blame &lt;file&gt;</code><span class="cmd-desc">Line-by-line author</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Stash</div>
+        <div class="cmd-row"><code>git stash</code><span class="cmd-desc">Stash changes</span></div>
+        <div class="cmd-row"><code>git stash -u</code><span class="cmd-desc">Include untracked</span></div>
+        <div class="cmd-row"><code>git stash list</code><span class="cmd-desc">List stashes</span></div>
+        <div class="cmd-row"><code>git stash pop</code><span class="cmd-desc">Apply &amp; drop</span></div>
+        <div class="cmd-row"><code>git stash drop</code><span class="cmd-desc">Delete top stash</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Undo & Fix</div>
+        <div class="cmd-row"><code>git restore &lt;file&gt;</code><span class="cmd-desc">Discard changes</span></div>
+        <div class="cmd-row"><code>git restore --staged &lt;f&gt;</code><span class="cmd-desc">Unstage file</span></div>
+        <div class="cmd-row"><code>git reset HEAD~1</code><span class="cmd-desc">Undo last commit (keep)</span></div>
+        <div class="cmd-row"><code>git reset --hard HEAD~1</code><span class="cmd-desc">Undo last commit (discard)</span></div>
+        <div class="cmd-row"><code>git revert &lt;hash&gt;</code><span class="cmd-desc">Revert commit</span></div>
+        <div class="cmd-row"><code>git cherry-pick &lt;hash&gt;</code><span class="cmd-desc">Apply commit here</span></div>
+        <div class="cmd-row"><code>git reflog</code><span class="cmd-desc">Recovery log</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Tags</div>
+        <div class="cmd-row"><code>git tag v1.0.0</code><span class="cmd-desc">Lightweight tag</span></div>
+        <div class="cmd-row"><code>git tag -a v1.0.0 -m "msg"</code><span class="cmd-desc">Annotated tag</span></div>
+        <div class="cmd-row"><code>git push --tags</code><span class="cmd-desc">Push all tags</span></div>
+        <div class="cmd-row"><code>git tag -d &lt;tag&gt;</code><span class="cmd-desc">Delete local tag</span></div>
+      </div>
+
+      <div class="card" data-accent="git">
+        <div class="card-title"><span class="dot"></span>Config</div>
+        <div class="cmd-row"><code>git config --list</code><span class="cmd-desc">Show config</span></div>
+        <div class="cmd-row"><code>git config user.name "Name"</code><span class="cmd-desc">Set name (local)</span></div>
+        <div class="cmd-row"><code>git config user.email "e"</code><span class="cmd-desc">Set email (local)</span></div>
+        <div class="cmd-row"><code>git config --global -e</code><span class="cmd-desc">Edit global config</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ CONVENTIONAL COMMITS ═══════════ -->
+  <div class="section" id="commits">
+    <div class="card-grid">
+
+      <div class="card" data-accent="commit" style="grid-column: 1 / -1; max-width: 700px;">
+        <div class="card-title"><span class="dot"></span>Format</div>
+        <div class="format-example">
+          <span class="hl">&lt;type&gt;</span>(<span class="hl2">scope</span>): <span class="hl3">&lt;description&gt;</span><br><br>
+          [optional body]<br><br>
+          [optional footer(s)]
+        </div>
+        <div style="margin-top:8px; font-size:11.5px; color:var(--text-dim); line-height:1.7;">
+          • Append <code>!</code> after type/scope for <strong style="color:var(--text)">BREAKING CHANGE</strong><br>
+          • Description: imperative mood, lowercase, no period<br>
+          • Footer: <code>BREAKING CHANGE: description</code> or <code>Refs: #123</code>
+        </div>
+      </div>
+
+      <div class="card" data-accent="commit">
+        <div class="card-title"><span class="dot"></span>Types</div>
+        <div class="commit-type"><span class="badge badge-feat">feat</span><span class="desc">New feature (bumps MINOR)</span></div>
+        <div class="commit-type"><span class="badge badge-fix">fix</span><span class="desc">Bug fix (bumps PATCH)</span></div>
+        <div class="commit-type"><span class="badge badge-docs">docs</span><span class="desc">Documentation only</span></div>
+        <div class="commit-type"><span class="badge badge-style">style</span><span class="desc">Formatting, whitespace</span></div>
+        <div class="commit-type"><span class="badge badge-refactor">refactor</span><span class="desc">Neither fix nor feature</span></div>
+        <div class="commit-type"><span class="badge badge-perf">perf</span><span class="desc">Performance improvement</span></div>
+        <div class="commit-type"><span class="badge badge-test">test</span><span class="desc">Add/fix tests</span></div>
+        <div class="commit-type"><span class="badge badge-build">build</span><span class="desc">Build system/deps</span></div>
+        <div class="commit-type"><span class="badge badge-ci">ci</span><span class="desc">CI/CD config</span></div>
+        <div class="commit-type"><span class="badge badge-chore">chore</span><span class="desc">Maintenance tasks</span></div>
+        <div class="commit-type"><span class="badge badge-revert">revert</span><span class="desc">Revert previous commit</span></div>
+      </div>
+
+      <div class="card" data-accent="commit">
+        <div class="card-title"><span class="dot"></span>Examples</div>
+        <div class="cmd-row" style="flex-direction:column; gap:2px;">
+          <code>feat(auth): add SSO login flow</code>
+          <span class="cmd-desc" style="text-align:left">New feature with scope</span>
+        </div>
+        <div class="cmd-row" style="flex-direction:column; gap:2px;">
+          <code>fix(api): handle null response body</code>
+          <span class="cmd-desc" style="text-align:left">Bug fix with scope</span>
+        </div>
+        <div class="cmd-row" style="flex-direction:column; gap:2px;">
+          <code>docs: update README setup steps</code>
+          <span class="cmd-desc" style="text-align:left">No scope needed</span>
+        </div>
+        <div class="cmd-row" style="flex-direction:column; gap:2px;">
+          <code>feat(api)!: change auth token format</code>
+          <span class="cmd-desc" style="text-align:left">Breaking change</span>
+        </div>
+        <div class="cmd-row" style="flex-direction:column; gap:2px;">
+          <code>refactor(ocr): simplify CSV pipeline</code>
+          <span class="cmd-desc" style="text-align:left">Code refactor with scope</span>
+        </div>
+        <div class="cmd-row" style="flex-direction:column; gap:2px;">
+          <code>ci: add staging deploy workflow</code>
+          <span class="cmd-desc" style="text-align:left">CI pipeline change</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ AZURE CLI ═══════════ -->
+  <div class="section" id="azure">
+    <div class="card-grid">
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>Auth & Account</div>
+        <div class="cmd-row"><code>az login</code><span class="cmd-desc">Browser login</span></div>
+        <div class="cmd-row"><code>az login --use-device-code</code><span class="cmd-desc">Device code flow</span></div>
+        <div class="cmd-row"><code>az account show</code><span class="cmd-desc">Current subscription</span></div>
+        <div class="cmd-row"><code>az account list -o table</code><span class="cmd-desc">List subscriptions</span></div>
+        <div class="cmd-row"><code>az account set -s &lt;id&gt;</code><span class="cmd-desc">Switch subscription</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>Resource Groups</div>
+        <div class="cmd-row"><code>az group list -o table</code><span class="cmd-desc">List RGs</span></div>
+        <div class="cmd-row"><code>az group create -n &lt;n&gt; -l &lt;loc&gt;</code><span class="cmd-desc">Create RG</span></div>
+        <div class="cmd-row"><code>az group delete -n &lt;name&gt;</code><span class="cmd-desc">Delete RG</span></div>
+        <div class="cmd-row"><code>az resource list -g &lt;rg&gt; -o table</code><span class="cmd-desc">Resources in RG</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>App Service & Static Web Apps</div>
+        <div class="cmd-row"><code>az webapp list -o table</code><span class="cmd-desc">List web apps</span></div>
+        <div class="cmd-row"><code>az webapp restart -n &lt;n&gt; -g &lt;rg&gt;</code><span class="cmd-desc">Restart app</span></div>
+        <div class="cmd-row"><code>az webapp log tail -n &lt;n&gt; -g &lt;rg&gt;</code><span class="cmd-desc">Stream logs</span></div>
+        <div class="cmd-row"><code>az webapp config appsettings set ...</code><span class="cmd-desc">Set env vars</span></div>
+        <div class="cmd-row"><code>az staticwebapp list -o table</code><span class="cmd-desc">List SWAs</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>Container Apps</div>
+        <div class="cmd-row"><code>az containerapp list -o table</code><span class="cmd-desc">List container apps</span></div>
+        <div class="cmd-row"><code>az containerapp logs show -n &lt;n&gt; -g &lt;rg&gt;</code><span class="cmd-desc">View logs</span></div>
+        <div class="cmd-row"><code>az containerapp update -n &lt;n&gt; -g &lt;rg&gt; ...</code><span class="cmd-desc">Update app</span></div>
+        <div class="cmd-row"><code>az containerapp revision list ...</code><span class="cmd-desc">List revisions</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>AI & Cognitive</div>
+        <div class="cmd-row"><code>az cognitiveservices account list -o table</code><span class="cmd-desc">List AI services</span></div>
+        <div class="cmd-row"><code>az cognitiveservices account keys list ...</code><span class="cmd-desc">Get keys</span></div>
+        <div class="cmd-row"><code>az cognitiveservices account deployment list ...</code><span class="cmd-desc">List deployments</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>Key Vault</div>
+        <div class="cmd-row"><code>az keyvault list -o table</code><span class="cmd-desc">List vaults</span></div>
+        <div class="cmd-row"><code>az keyvault secret list --vault-name &lt;v&gt;</code><span class="cmd-desc">List secrets</span></div>
+        <div class="cmd-row"><code>az keyvault secret show --vault-name &lt;v&gt; -n &lt;n&gt;</code><span class="cmd-desc">Get secret</span></div>
+        <div class="cmd-row"><code>az keyvault secret set --vault-name &lt;v&gt; -n &lt;n&gt; --value &lt;val&gt;</code><span class="cmd-desc">Set secret</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>Deployment & Bicep</div>
+        <div class="cmd-row"><code>az deployment group create -g &lt;rg&gt; -f main.bicep</code><span class="cmd-desc">Deploy Bicep</span></div>
+        <div class="cmd-row"><code>az deployment group what-if ...</code><span class="cmd-desc">Preview changes</span></div>
+        <div class="cmd-row"><code>az stack group create -n &lt;n&gt; -g &lt;rg&gt; -f main.bicep</code><span class="cmd-desc">Deploy stack</span></div>
+        <div class="cmd-row"><code>az bicep build -f main.bicep</code><span class="cmd-desc">Compile Bicep → ARM</span></div>
+      </div>
+
+      <div class="card" data-accent="azure">
+        <div class="card-title"><span class="dot"></span>Useful Flags</div>
+        <div class="cmd-row"><code>-o table</code><span class="cmd-desc">Table output</span></div>
+        <div class="cmd-row"><code>-o json</code><span class="cmd-desc">JSON output</span></div>
+        <div class="cmd-row"><code>--query "[].{Name:name}"</code><span class="cmd-desc">JMESPath filter</span></div>
+        <div class="cmd-row"><code>--debug</code><span class="cmd-desc">Debug logging</span></div>
+        <div class="cmd-row"><code>--no-wait</code><span class="cmd-desc">Don't wait for completion</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ MISC ═══════════ -->
+  <div class="section" id="misc">
+    <div class="card-grid">
+
+      <div class="card" data-accent="misc">
+        <div class="card-title"><span class="dot"></span>GitHub CLI</div>
+        <div class="cmd-row"><code>gh repo clone &lt;r&gt;</code><span class="cmd-desc">Clone repo</span></div>
+        <div class="cmd-row"><code>gh pr create</code><span class="cmd-desc">Create PR</span></div>
+        <div class="cmd-row"><code>gh pr list</code><span class="cmd-desc">List open PRs</span></div>
+        <div class="cmd-row"><code>gh pr checkout &lt;n&gt;</code><span class="cmd-desc">Check out PR branch</span></div>
+        <div class="cmd-row"><code>gh pr merge &lt;n&gt;</code><span class="cmd-desc">Merge PR</span></div>
+        <div class="cmd-row"><code>gh issue list</code><span class="cmd-desc">List issues</span></div>
+        <div class="cmd-row"><code>gh run list</code><span class="cmd-desc">List workflow runs</span></div>
+        <div class="cmd-row"><code>gh run watch</code><span class="cmd-desc">Watch running workflow</span></div>
+      </div>
+
+      <div class="card" data-accent="misc">
+        <div class="card-title"><span class="dot"></span>npm / Node</div>
+        <div class="cmd-row"><code>npm init -y</code><span class="cmd-desc">Init package.json</span></div>
+        <div class="cmd-row"><code>npm install &lt;pkg&gt;</code><span class="cmd-desc">Install dependency</span></div>
+        <div class="cmd-row"><code>npm install -D &lt;pkg&gt;</code><span class="cmd-desc">Install dev dep</span></div>
+        <div class="cmd-row"><code>npm run &lt;script&gt;</code><span class="cmd-desc">Run script</span></div>
+        <div class="cmd-row"><code>npm outdated</code><span class="cmd-desc">Check outdated</span></div>
+        <div class="cmd-row"><code>npm audit</code><span class="cmd-desc">Security audit</span></div>
+        <div class="cmd-row"><code>npx &lt;cmd&gt;</code><span class="cmd-desc">Run without install</span></div>
+      </div>
+
+      <div class="card" data-accent="misc">
+        <div class="card-title"><span class="dot"></span>Docker</div>
+        <div class="cmd-row"><code>docker ps</code><span class="cmd-desc">Running containers</span></div>
+        <div class="cmd-row"><code>docker ps -a</code><span class="cmd-desc">All containers</span></div>
+        <div class="cmd-row"><code>docker images</code><span class="cmd-desc">List images</span></div>
+        <div class="cmd-row"><code>docker build -t &lt;tag&gt; .</code><span class="cmd-desc">Build image</span></div>
+        <div class="cmd-row"><code>docker compose up -d</code><span class="cmd-desc">Start services</span></div>
+        <div class="cmd-row"><code>docker compose down</code><span class="cmd-desc">Stop services</span></div>
+        <div class="cmd-row"><code>docker logs -f &lt;id&gt;</code><span class="cmd-desc">Follow logs</span></div>
+        <div class="cmd-row"><code>docker system prune -a</code><span class="cmd-desc">Clean everything</span></div>
+      </div>
+
+      <div class="card" data-accent="misc">
+        <div class="card-title"><span class="dot"></span>Terminal Shortcuts</div>
+        <div class="cmd-row"><code>Ctrl+R</code><span class="cmd-desc">Reverse search history</span></div>
+        <div class="cmd-row"><code>Ctrl+A / Ctrl+E</code><span class="cmd-desc">Start / End of line</span></div>
+        <div class="cmd-row"><code>Ctrl+K</code><span class="cmd-desc">Delete to end of line</span></div>
+        <div class="cmd-row"><code>Ctrl+W</code><span class="cmd-desc">Delete word backward</span></div>
+        <div class="cmd-row"><code>!!</code><span class="cmd-desc">Repeat last command</span></div>
+        <div class="cmd-row"><code>!$</code><span class="cmd-desc">Last arg of prev cmd</span></div>
+      </div>
+
+      <div class="card" data-accent="misc">
+        <div class="card-title"><span class="dot"></span>Markdown</div>
+        <div class="cmd-row"><code># H1  ## H2  ### H3</code><span class="cmd-desc">Headings</span></div>
+        <div class="cmd-row"><code>**bold**  *italic*</code><span class="cmd-desc">Emphasis</span></div>
+        <div class="cmd-row"><code>[text](url)</code><span class="cmd-desc">Link</span></div>
+        <div class="cmd-row"><code>![alt](img.png)</code><span class="cmd-desc">Image</span></div>
+        <div class="cmd-row"><code>```lang ... ```</code><span class="cmd-desc">Code block</span></div>
+        <div class="cmd-row"><code>- [ ] task</code><span class="cmd-desc">Task list</span></div>
+        <div class="cmd-row"><code>| col | col |</code><span class="cmd-desc">Table</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="no-results" id="no-results" style="display:none;">No matching commands found.</div>
+
+</div>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('.section');
+  const searchInput = document.getElementById('search');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.section).classList.add('active');
+      searchInput.value = '';
+      filterCards('');
+    });
+  });
+
+  // Search
+  searchInput.addEventListener('input', (e) => {
+    filterCards(e.target.value.toLowerCase());
+  });
+
+  function filterCards(query) {
+    const noResults = document.getElementById('no-results');
+    let anyVisible = false;
+
+    if (!query) {
+      // Show active section, reset
+      document.querySelectorAll('.card').forEach(c => c.style.display = '');
+      document.querySelectorAll('.cmd-row, .commit-type').forEach(r => r.style.display = '');
+      noResults.style.display = 'none';
+      return;
+    }
+
+    // Show all sections when searching
+    sections.forEach(s => s.classList.add('active'));
+    tabs.forEach(t => t.classList.remove('active'));
+
+    document.querySelectorAll('.card').forEach(card => {
+      const rows = card.querySelectorAll('.cmd-row, .commit-type');
+      let cardHasMatch = false;
+
+      // Check card title
+      const title = card.querySelector('.card-title');
+      const titleMatch = title && title.textContent.toLowerCase().includes(query);
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(query) || titleMatch) {
+          row.style.display = '';
+          cardHasMatch = true;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      // Also match format examples and other non-row content
+      const fullText = card.textContent.toLowerCase();
+      if (fullText.includes(query)) cardHasMatch = true;
+
+      card.style.display = cardHasMatch ? '' : 'none';
+      if (cardHasMatch) anyVisible = true;
+    });
+
+    noResults.style.display = anyVisible ? 'none' : 'block';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 | Dev Quick Ref</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-dim: #8b949e;
+      --accent-git: #f97316;
+      --accent-commit: #22d3ee;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .error-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 120px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-git), var(--accent-commit));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .message {
+      font-size: 20px;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+    }
+
+    .hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+
+    .hint code {
+      color: var(--accent-commit);
+    }
+
+    a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    a:hover {
+      border-color: var(--accent-commit);
+      color: var(--accent-commit);
+    }
+  </style>
+</head>
+<body>
+  <div class="error-code">404</div>
+  <p class="message">Page not found</p>
+  <div class="hint"><code>git checkout</code> the right path</div>
+  <a href="/">Back to ~/dev-ref</a>
+</body>
+</html>
